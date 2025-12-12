@@ -6,6 +6,7 @@ const todoList = {
         return{
             list: [],
             newTodoList: {
+                testo:"",
                 done:false
             }
         }
@@ -16,7 +17,8 @@ const todoList = {
             if (this.newTodoList.testo) {
                 this.list.push(this.newTodoList);
                 this.newTodoList = {
-                done:false
+                    testo:"",
+                    done:false
                 }
                 console.log('aggiunto item')
                 localStorage.setItem('item',JSON.stringify(this.list))
@@ -29,9 +31,6 @@ const todoList = {
         },
         
     },
-    // beforeCreate(){
-    //     console.log('brefore create');
-    // },
     created(){
         this.list = localStorage.getItem('item') ? JSON.parse(localStorage.getItem('item')) : this.list
         
@@ -39,9 +38,6 @@ const todoList = {
     updated(){
         localStorage.setItem('item',JSON.stringify(this.list))
     }
-    // beforeUpdate(){
-    //     console.log('before update');
-    // }
 }
 
 
