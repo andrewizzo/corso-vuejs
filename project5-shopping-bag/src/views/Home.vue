@@ -16,7 +16,7 @@
                     @click="aggiungiProdottoCarrello(prodotto)">Add to bag</button>
                 <button
                     v-else
-                    @click="this.$store.dispatch('rimuoviProdottoCarrelo',prodotto.id)"
+                    @click="this.$store.dispatch('rimuoviProdottoCarrello',prodotto.id)"
                     class="remove">Remove</button>
                     
             </div>
