@@ -1,4 +1,7 @@
 <script setup>
+  import { defineStore } from 'pinia';
+import { useTaskStore } from '../stores/taskStore';
+  const store = useTaskStore()
 const props = defineProps(['task']);
 </script>
 
@@ -11,7 +14,7 @@ const props = defineProps(['task']);
           {{ task.description }}
         </p>
         <div class="task-check">
-          <input type="checkbox" :checked="task.completed" @click="$emit('toggleCompleted',task.id)"/>
+          <input type="checkbox" :checked="task.completed" @click="store.toggleCompleted(task.id)"/>
           <label>
             {{task.completed ? 'Done' : 'To-do'}}
           </label>

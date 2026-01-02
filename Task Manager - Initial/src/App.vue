@@ -1,78 +1,34 @@
 <script setup>
-import { reactive, ref } from 'vue';
+import { ref } from 'vue';
 import Task from './components/Task.vue';
 import Filter from './components/Filter.vue';
+import Modal from './components/Modal.vue';
+import { useTaskStore } from './stores/taskStore';
 
 //ref si usa solo per le primitive.(boolean, string, number)
 const appName = ref('task manager')
 
-//reactive si usa solo per gli array e per gli oggetti
-let tasks = reactive([
-    {
-      name: "Website design",
-      description: "Define the style guide, branding and create the webdesign on Figma.",
-      completed: true,
-      id:1
-    },
-    {
-      name: "Website development",
-      description: "Develop the portfolio website using Vue JS.",
-      completed: false,
-      id:2
-    },
-    {
-      name: "Hosting and infrastructure",
-      description: "Define hosting, domain and infrastructure for the portfolio website.",
-      completed: false,
-      id:3
-    },
-    {
-      name: "Composition API",
-      description: "Learn how to use the composition API and how it compares to the options API.",
-      completed: true,
-      id:4
-    },
-    {
-      name: "Pinia",
-      description: "Learn how to setup a store using Pinia.",
-      completed: true,
-      id:5
-    },
-    {
-      name: "Groceries",
-      description: "Buy rice, apples and potatos.",
-      completed: false,
-      id:6
-    },
-    {
-      name: "Bank account",
-      description: "Open a bank account for my freelance business.",
-      completed: false,
-      id:7
-    }
-]);
+const store = useTaskStore();
 
-let newTask = {completed:false}
+store.$subscribe((mutation, state) => {
+  // persist the whole state to the local storage whenever it changes
+  localStorage.setItem('tasks', JSON.stringify(state.tasks))
+})
 
-let filterBy = ref("");
+let newTask = ref({
+  name:'',
+  description:'',
+  completed:false,
+})
 
-function addTask(){
-  if (newTask.name && newTask.description) {   
-    newTask.id = Math.max(...tasks.map(task => task.id)) + 1; 
-    tasks.push(newTask)
-    newTask = {completed:false}
-  }else{
-    alert('inserisci tutti i campi')
+function openModal(){
+  store.openModal()
+  newTask.value = {
+    name:'',
+    description:'',
+    completed:false
   }
 }
-function toggleCompleted(id){
-  tasks.forEach(task => {
-    if (task.id === id) {
-      task.completed = !task.completed
-    }
-  })
-}
-
 </script>
 
 <template>
@@ -84,26 +40,31 @@ function toggleCompleted(id){
           {{ appName }}
         </h1>
       </div>
+      <div class="header-side">
+        <button 
+        @click="openModal"
+        class="btn secondary">+aggiungi task</button>
+      </div>
     </div>
 
-    <Filter :filterBy="filterBy"/>
+    <Filter/>
 
     <div class="tasks">
-      <Task @toggleCompleted="toggleCompleted" v-for="(task,index) in tasks" :task="task" :key="index" />
+      <Task @toggleCompleted="toggleCompleted" v-for="(task) in store.filteredTasks" :task="task" :key="task.id" />
     </div>
 
-    <div class="add-task">
-      <h3>Add a new task</h3>
-      <input type="text" name="title" placeholder="Enter a title..." v-model="newTask.name"><br />
-      <textarea name="description" rows="4" placeholder="Enter a description..." v-model="newTask.description"/><br />
-      <button class="btn gray" @click="addTask">Add Task</button>
-
-    </div>
-
+    <Modal v-if="store.modalIsActive">
+      <div class="form">
+        <h3>Add a new task</h3>
+        <label for="title">Title*</label>
+        <input type="text" name="title" placeholder="Enter a title..." v-model="newTask.name"><br />
+        <label for="description">Description*</label>
+        <textarea name="description" rows="4" placeholder="Enter a description..." v-model="newTask.description"/><br />
+        <button class="btn gray" @click="store.addTask(newTask)">Add Task</button>
+        
+      </div>
+    </Modal>
   </main>
-  
-   
-
 </template>
 
 
